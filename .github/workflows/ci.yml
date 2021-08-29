@@ -1,0 +1,26 @@
+name: continuous integration & continuous deployment to GitHub Pages
+on:
+  push:
+    branches:
+      - solution
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out branch
+        uses: actions/checkout@v2
+      - name: set up node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.x"
+      - name: install dependencies
+        run: npm install
+      - name: check code quality (prettier, lint and typescript)
+        run: npm run check
+      - name: build
+        run: npm run build
+      - run: git config user.name "Chuntong Gao"
+      - run: git config user.email "heihegao@gmail.com"
+      - run: git --work-tree build add --all
+      - run: git commit -m "automatic deployment"
+      - run: git push origin HEAD:gh-pages --force
