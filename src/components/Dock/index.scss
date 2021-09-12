@@ -1,0 +1,247 @@
+@keyframes bottom {
+    from,
+    20%,
+    53%,
+    to {
+        transform: translate3d(0, 0, 0);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    40%,
+    43% {
+        transform: translate3d(0, -35px, 0) scaleY(1.1);
+        animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    }
+
+    70% {
+        transform: translate3d(0, -35px, 0) scaleY(1.05);
+        animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    }
+
+    80% {
+        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+        transform: translate3d(0, 0, 0) scaleY(0.95);
+    }
+
+    90% {
+        transform: translate3d(0, -6px, 0) scaleY(1.02);
+    }
+}
+
+@keyframes top {
+    from,
+    20%,
+    53%,
+    to {
+        transform: translate3d(0, 0, 0);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    40%,
+    43% {
+        transform: translate3d(0, 35px, 0) scaleY(1.1);
+        animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    }
+
+    70% {
+        transform: translate3d(0, 35px, 0) scaleY(1.05);
+        animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    }
+
+    80% {
+        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+        transform: translate3d(0, 0, 0) scaleY(0.95);
+    }
+
+    90% {
+        transform: translate3d(0, 6px, 0) scaleY(1.02);
+    }
+}
+
+@keyframes left {
+    from,
+    20%,
+    53%,
+    to {
+        transform: translate3d(0, 0, 0);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    40%,
+    43% {
+        transform: translate3d(35px, 0, 0) scaleX(1.1);
+        animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    }
+
+    70% {
+        transform: translate3d(35px, 0, 0) scaleX(1.05);
+        animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    }
+
+    80% {
+        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+        transform: translate3d(0, 0, 0) scaleX(0.95);
+    }
+
+    90% {
+        transform: translate3d(6px, 0, 0) scaleX(1.02);
+    }
+}
+
+@keyframes right {
+    from,
+    20%,
+    53%,
+    to {
+        transform: translate3d(0, 0, 0);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    40%,
+    43% {
+        transform: translate3d(-35px, 0, 0) scaleX(1.1);
+        animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    }
+
+    70% {
+        transform: translate3d(-35px, 0, 0) scaleX(1.05);
+        animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    }
+
+    80% {
+        transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+        transform: translate3d(0, 0, 0) scaleX(0.95);
+    }
+
+    90% {
+        transform: translate3d(-6px, 0, 0) scaleX(1.02);
+    }
+}
+
+#AppFooter {
+    position: absolute;
+    display: flex;
+
+    @each $member in top, bottom {
+        &.#{$member} {
+            justify-content: center;
+            width: 100vw;
+            #{$member}: 0;
+        }
+    }
+
+    @each $member in left, right {
+        &.#{$member} {
+            align-items: center;
+            height: 100vh;
+            #{$member}: 0;
+        }
+    }
+
+    #Docker {
+        display: flex;
+        padding: 4px 4px 7px;
+        background-color: rgba(60, 60, 60, 0.95);
+        border: 1px solid #7a697a;
+        border-radius: 1rem;
+        box-shadow: rgba(0, 0, 0, 0.31) 0 0 1px, rgba(0, 0, 0, 0.18) 0 0 5px, rgba(0, 0, 0, 0.3) 0 8px 50px;
+        transition: margin 0.5s;
+
+        &.top {
+            padding: 7px 4px 4px;
+        }
+
+        &.bottom {
+            padding: 4px 4px 7px;
+        }
+
+        &.left {
+            padding: 4px 4px 4px 7px;
+        }
+
+        &.right {
+            padding: 4px 7px 4px 4px;
+        }
+
+        .DockItem {
+            position: relative;
+            display: flex;
+
+            &.active {
+                &::after {
+                    position: absolute;
+                    width: 4px;
+                    height: 4px;
+                    content: "";
+                    background-color: #fff;
+                    border-radius: 50%;
+                }
+            }
+
+            &.top {
+                justify-content: center;
+
+                &.bounce {
+                    animation-name: top; /* referring directly to the animation's @keyframe declaration */
+                    animation-duration: 2s; /* don't forget to set a duration! */
+                }
+
+                &.active {
+                    &::after {
+                        top: -5px;
+                    }
+                }
+            }
+
+            &.bottom {
+                justify-content: center;
+
+                &.bounce {
+                    animation-name: bottom; /* referring directly to the animation's @keyframe declaration */
+                    animation-duration: 2s; /* don't forget to set a duration! */
+                }
+
+                &.active {
+                    &::after {
+                        bottom: -6px;
+                    }
+                }
+            }
+
+            @each $member in left, right {
+                &.#{$member} {
+                    align-items: center;
+
+                    &.bounce {
+                        animation-name: #{$member}; /* referring directly to the animation's @keyframe declaration */
+                        animation-duration: 2s; /* don't forget to set a duration! */
+                    }
+
+                    &.active {
+                        &::after {
+                            #{$member}: -6px;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.top {
+            align-items: flex-start;
+        }
+
+        &.bottom {
+            align-items: flex-end;
+        }
+
+        &.left {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        &.right {
+            flex-direction: column;
+            align-items: flex-end;
+        }
+    }
+}

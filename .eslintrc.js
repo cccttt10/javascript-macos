@@ -25,7 +25,8 @@ module.exports = {
         'max-lines': ['warn', 200],
         'no-console': 'warn',
         'no-trailing-spaces': 'error',
-        'no-unused-vars': ['error', {
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': ['error', {
             'argsIgnorePattern': '^(props)$',
             'varsIgnorePattern': 'React'
         }],
