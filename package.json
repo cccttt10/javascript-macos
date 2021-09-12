@@ -37,7 +37,7 @@
   },
   "name": "javascript-macos",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "rm -rf build/ && tsc && vite build && mv dist build",
     "check": "npm run stylelint && npm run prettier-check && npm run eslint-check && npm run tsc-check",
     "deploy": "gh-pages -d build",
     "start": "vite",
