@@ -21,6 +21,7 @@ jobs:
         run: npm run build
       - run: git config user.name "Chuntong Gao"
       - run: git config user.email "heihegao@gmail.com"
-      - run: git --work-tree build add --all
+      - run: git checkout -b temporary-branch
+      - run: git add .
       - run: git commit -m "automatic deployment"
       - run: git push origin HEAD:gh-pages --force
