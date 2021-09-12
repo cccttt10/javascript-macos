@@ -19,8 +19,10 @@ jobs:
         run: npm run check
       - name: build
         run: npm run build
+      - run: rm -rf .git/
+      - run: git init
       - run: git config user.name "Chuntong Gao"
       - run: git config user.email "heihegao@gmail.com"
-      - run: git --work-tree build add --all
+      - run: git add .
       - run: git commit -m "automatic deployment"
       - run: git push origin HEAD:gh-pages --force
