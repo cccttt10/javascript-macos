@@ -16,7 +16,7 @@ interface PropsTypes {
     clickEvent?: (T: any) => void;
 }
 
-export const Iconfont: React.FC<PropsTypes> = ({
+const Icon: React.FC<PropsTypes> = ({
     className,
     type,
     style,
@@ -35,3 +35,5 @@ export const Iconfont: React.FC<PropsTypes> = ({
         </svg>
     );
 };
+
+export default Icon;
