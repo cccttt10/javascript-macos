@@ -38,8 +38,8 @@ const Dock: React.FC = () => {
     }, []);
     const [dockConfig, setDockConfig] = useState<DockConfig>({
         position: DockPosition.BOTTOM,
-        length: DEFAULT_LENGTH,
-        maxLength: DEFAULT_LENGTH * 1.5,
+        iconSize: DEFAULT_LENGTH,
+        bigIconSize: DEFAULT_LENGTH * 1.5,
         distanceBetweenIcons: 0,
         distanceToScreenEdge: 5,
         style: {},
@@ -135,37 +135,38 @@ const Dock: React.FC = () => {
                 const iconElement = iconElements[i] as HTMLDivElement;
                 let x, y;
                 if (dockConfig.position === DockPosition.BOTTOM) {
-                    x = iconElement.offsetLeft + dockConfig.length / 2 - clientX;
+                    x = iconElement.offsetLeft + dockConfig.iconSize / 2 - clientX;
                     y =
                         iconElement.offsetTop +
                         computeOffset(dockRef.current, 'top') +
                         iconElement.offsetHeight / 2 -
                         clientY;
                 } else if (dockConfig.position === DockPosition.RIGHT) {
-                    x = iconElement.offsetTop + dockConfig.length / 2 - clientY;
+                    x = iconElement.offsetTop + dockConfig.iconSize / 2 - clientY;
                     y =
                         iconElement.offsetLeft +
                         computeOffset(dockRef.current, 'left') +
                         iconElement.offsetWidth / 2 -
                         clientX;
                 } else {
-                    x = iconElement.offsetTop + dockConfig.length / 2 - clientY;
-                    y = iconElement.offsetLeft + dockConfig.length / 2 - clientX;
+                    x = iconElement.offsetTop + dockConfig.iconSize / 2 - clientY;
+                    y = iconElement.offsetLeft + dockConfig.iconSize / 2 - clientX;
                 }
                 let magnifyAnimationScale =
                     1 -
                     Math.sqrt(x * x + y * y) /
-                        (iconElements.length * dockConfig.length);
+                        (iconElements.length * dockConfig.iconSize);
                 if (
                     magnifyAnimationScale <
-                    dockConfig.length / dockConfig.maxLength
+                    dockConfig.iconSize / dockConfig.bigIconSize
                 ) {
-                    magnifyAnimationScale = dockConfig.length / dockConfig.maxLength;
+                    magnifyAnimationScale =
+                        dockConfig.iconSize / dockConfig.bigIconSize;
                 }
-                const multiplier = dockConfig.maxLength / dockConfig.length;
-                if (dockConfig.maxLength / dockConfig.length) {
+                const multiplier = dockConfig.bigIconSize / dockConfig.iconSize;
+                if (dockConfig.bigIconSize / dockConfig.iconSize) {
                     iconElement.style.height = iconElement.style.width =
-                        dockConfig.length * multiplier * magnifyAnimationScale +
+                        dockConfig.iconSize * multiplier * magnifyAnimationScale +
                         'px';
                 }
             }
@@ -182,7 +183,7 @@ const Dock: React.FC = () => {
             setDockConfig({
                 ...dockConfig,
                 style: {
-                    height: dockConfig.length * 1 + 12,
+                    height: dockConfig.iconSize * 1 + 12,
                     marginBottom: dockConfig.distanceToScreenEdge * 1,
                 },
             });
@@ -190,7 +191,7 @@ const Dock: React.FC = () => {
             setDockConfig({
                 ...dockConfig,
                 style: {
-                    height: dockConfig.length * 1 + 12,
+                    height: dockConfig.iconSize * 1 + 12,
                     marginTop: dockConfig.distanceToScreenEdge * 1,
                 },
             });
@@ -198,7 +199,7 @@ const Dock: React.FC = () => {
             setDockConfig({
                 ...dockConfig,
                 style: {
-                    width: dockConfig.length * 1 + 12,
+                    width: dockConfig.iconSize * 1 + 12,
                     marginLeft: dockConfig.distanceToScreenEdge * 1,
                 },
             });
@@ -206,7 +207,7 @@ const Dock: React.FC = () => {
             setDockConfig({
                 ...dockConfig,
                 style: {
-                    width: dockConfig.length * 1 + 12,
+                    width: dockConfig.iconSize * 1 + 12,
                     marginRight: dockConfig.distanceToScreenEdge * 1,
                 },
             });
@@ -215,7 +216,7 @@ const Dock: React.FC = () => {
         for (let i = 0; i < iconElements.length; i++) {
             const iconElement = iconElements[i] as HTMLDivElement;
             iconElement.style.width = iconElement.style.height =
-                dockConfig.length + 'px';
+                dockConfig.iconSize + 'px';
         }
     }, [dockConfig]);
     useEffect(setInitialPosition, []);

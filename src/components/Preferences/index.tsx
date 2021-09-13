@@ -36,8 +36,8 @@ const DOCK_POSITIONS = [
     DockPosition.LEFT,
 ];
 
-const CHANGE_DOCK_LENGTH = 'Default icon size';
-const CHANGE_DOCK_MAX_LENGTH = 'When you hover over an icon, its size will be';
+const CHANGE_DOCK_ICON_SIZE = 'Default icon size';
+const CHANGE_DOCK_BIG_ICON_SIZE = 'When you hover over an icon, its size will be';
 const CHANGE_DOCK_DISTANCE_BETWEEN_ICONS = 'The distance between icons';
 const CHANGE_DOCK_DISTANCE_TO_SCREEN_EDGE =
     'The distance between the dock and the edge of the screen';
@@ -49,14 +49,14 @@ const Preferences: React.FC<PreferencesProps> = (props: PreferencesProps) => {
         props;
     const sliders: SliderConfig[] = [
         {
-            title: CHANGE_DOCK_LENGTH,
-            value: dockConfig.length * 1,
+            title: CHANGE_DOCK_ICON_SIZE,
+            value: dockConfig.iconSize * 1,
             maxValue: 128,
             minValue: 25,
         },
         {
-            title: CHANGE_DOCK_MAX_LENGTH,
-            value: dockConfig.maxLength * 1,
+            title: CHANGE_DOCK_BIG_ICON_SIZE,
+            value: dockConfig.bigIconSize * 1,
             maxValue: 256,
             minValue: 25,
         },
@@ -89,11 +89,11 @@ const Preferences: React.FC<PreferencesProps> = (props: PreferencesProps) => {
     const handleSliderChange = useCallback(
         (value: number, title: string) => {
             switch (title) {
-                case CHANGE_DOCK_LENGTH:
-                    setDockConfig({ ...dockConfig, length: value });
+                case CHANGE_DOCK_ICON_SIZE:
+                    setDockConfig({ ...dockConfig, iconSize: value });
                     break;
-                case CHANGE_DOCK_MAX_LENGTH:
-                    setDockConfig({ ...dockConfig, maxLength: value });
+                case CHANGE_DOCK_BIG_ICON_SIZE:
+                    setDockConfig({ ...dockConfig, bigIconSize: value });
                     break;
                 case CHANGE_DOCK_DISTANCE_BETWEEN_ICONS:
                     setDockConfig({ ...dockConfig, distanceBetweenIcons: value });

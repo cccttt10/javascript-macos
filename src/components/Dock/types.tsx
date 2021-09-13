@@ -9,8 +9,8 @@ export const enum DockPosition {
 
 export interface DockConfig {
     position: DockPosition;
-    length: number;
-    maxLength: number;
+    iconSize: number;
+    bigIconSize: number;
     distanceBetweenIcons: number;
     distanceToScreenEdge: number;
     style: CSSProperties;
