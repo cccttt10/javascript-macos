@@ -2,7 +2,6 @@
 import './index.scss';
 
 import React, {
-    createContext,
     CSSProperties,
     useCallback,
     useEffect,
@@ -11,6 +10,7 @@ import React, {
     useState,
 } from 'react';
 
+import Preferences from '../Preferences';
 import CalculatorIcon from './image/Calculator.png';
 import ChromeIcon from './image/Chrome.png';
 import DrawingIcon from './image/Drawing.png';
@@ -18,9 +18,8 @@ import FinderIcon from './image/Finder.png';
 import LaunchpadIcon from './image/Launchpad.png';
 import PreferencesIcon from './image/Preferences.png';
 import TerminalIcon from './image/Terminal.png';
+import { AppState, DockConfig, DockPosition } from './types';
 /// <reference path="image.d.ts" />
-
-export const DockContext = createContext<any>([]);
 
 const Dock: React.FC = () => {
     const DEFAULT_LENGTH = 68;
@@ -37,35 +36,14 @@ const Dock: React.FC = () => {
             DrawingIcon,
         ];
     }, []);
-    enum DockPosition {
-        BOTTOM = 'bottom',
-        TOP = 'top',
-        RIGHT = 'right',
-        LEFT = 'left',
-    }
-    interface DockConfig {
-        position: DockPosition;
-        length: number;
-        maxLength: number;
-        distanceBetweenIcons: number;
-        distanceToScreenEdge: number;
-        hoverAnimationEnabled: boolean;
-        style: CSSProperties;
-    }
     const [dockConfig, setDockConfig] = useState<DockConfig>({
         position: DockPosition.BOTTOM,
         length: DEFAULT_LENGTH,
         maxLength: DEFAULT_LENGTH * 1.5,
         distanceBetweenIcons: 0,
         distanceToScreenEdge: 5,
-        hoverAnimationEnabled: true,
         style: {},
     });
-    enum AppState {
-        RUNNING_IN_BACKGROUND,
-        RUNNING_IN_FOREGROUND,
-        CLOSED,
-    }
     const [preferencesState, setPreferencesState] = useState<AppState>(
         AppState.CLOSED
     );
@@ -74,6 +52,7 @@ const Dock: React.FC = () => {
     );
     const [drawingState, setDrawingState] = useState<AppState>(AppState.CLOSED);
     // const [showLaunchpad, setShowLaunchPad] = useState(false);
+
     const handleDockIconClick = useCallback(
         (iconName: string) => {
             if (!dockRef || !dockRef.current) {
@@ -124,12 +103,12 @@ const Dock: React.FC = () => {
         [
             dockIcons,
             preferencesState,
-            AppState,
             calculatorState,
             drawingState,
             BOUNCE_ANIMATION_DURATION,
         ]
     );
+
     const computeOffset = useCallback(
         (element: HTMLElement, offset: 'top' | 'left'): number => {
             const elementOffset =
@@ -144,6 +123,7 @@ const Dock: React.FC = () => {
         },
         []
     );
+
     const handleMousemove = useCallback(
         event => {
             const { clientX, clientY } = event;
@@ -190,7 +170,7 @@ const Dock: React.FC = () => {
                 }
             }
         },
-        [dockConfig, computeOffset, DockPosition]
+        [dockConfig, computeOffset]
     );
 
     // set the initial position of the dock and the dock items
@@ -218,7 +198,7 @@ const Dock: React.FC = () => {
             setDockConfig({
                 ...dockConfig,
                 style: {
-                    height: dockConfig.length * 1 + 12,
+                    width: dockConfig.length * 1 + 12,
                     marginLeft: dockConfig.distanceToScreenEdge * 1,
                 },
             });
@@ -226,7 +206,7 @@ const Dock: React.FC = () => {
             setDockConfig({
                 ...dockConfig,
                 style: {
-                    height: dockConfig.length * 1 + 12,
+                    width: dockConfig.length * 1 + 12,
                     marginRight: dockConfig.distanceToScreenEdge * 1,
                 },
             });
@@ -237,7 +217,7 @@ const Dock: React.FC = () => {
             iconElement.style.width = iconElement.style.height =
                 dockConfig.length + 'px';
         }
-    }, [dockConfig, DockPosition]);
+    }, [dockConfig]);
     useEffect(setInitialPosition, []);
 
     const labelRunningAppIcons = (): void => {
@@ -282,7 +262,6 @@ const Dock: React.FC = () => {
     };
 
     useEffect(labelRunningAppIcons, [
-        AppState,
         calculatorState,
         dockIcons,
         drawingState,
@@ -300,10 +279,16 @@ const Dock: React.FC = () => {
                   marginTop: dockConfig.distanceBetweenIcons * 1,
                   marginBottom: dockConfig.distanceBetweenIcons * 1,
               };
-    }, [dockConfig, DockPosition]);
+    }, [dockConfig]);
 
     return (
         <React.Fragment>
+            <Preferences
+                dockConfig={dockConfig}
+                setDockConfig={setDockConfig}
+                preferencesState={preferencesState}
+                setPreferencesState={setPreferencesState}
+            />
             <footer className={dockConfig.position} id="AppFooter">
                 <div
                     id="Docker"
