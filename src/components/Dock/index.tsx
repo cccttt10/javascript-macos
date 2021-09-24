@@ -220,7 +220,13 @@ const Dock: React.FC = () => {
         }
     }, [dockConfig]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(setInitialPosition, []);
+    useEffect(setInitialPosition, [
+        dockConfig.position,
+        dockConfig.iconSize,
+        dockConfig.bigIconSize,
+        dockConfig.distanceBetweenIcons,
+        dockConfig.distanceToScreenEdge,
+    ]);
 
     const labelRunningAppIcons = (): void => {
         if (!dockRef || !dockRef.current) {
