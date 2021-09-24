@@ -2,7 +2,7 @@ import './index.scss';
 
 import React from 'react';
 
-const Main = () => {
+const Main: React.FC = () => {
     return (
         <div className="AppMain">
             <div id="main-view" />

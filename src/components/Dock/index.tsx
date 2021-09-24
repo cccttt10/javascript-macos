@@ -219,6 +219,7 @@ const Dock: React.FC = () => {
                 dockConfig.iconSize + 'px';
         }
     }, [dockConfig]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(setInitialPosition, []);
 
     const labelRunningAppIcons = (): void => {

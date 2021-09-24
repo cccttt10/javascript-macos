@@ -75,13 +75,9 @@ const Preferences: React.FC<PreferencesProps> = (props: PreferencesProps) => {
     ];
 
     useEffect(() => {
-        console.log('here');
-        // console.log(preferencesState === AppState.CLOSED);
-        console.log(preferencesState);
         if (preferencesState === AppState.CLOSED) {
             close();
         } else {
-            console.log('open');
             open();
         }
     }, [close, open, preferencesState]);
