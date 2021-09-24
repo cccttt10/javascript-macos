@@ -10,14 +10,14 @@ import React, {
     useState,
 } from 'react';
 
+import CalculatorIcon from '../../assets/images/Calculator.png';
+import ChromeIcon from '../../assets/images/Chrome.png';
+import DrawingIcon from '../../assets/images/Drawing.png';
+import FinderIcon from '../../assets/images/Finder.png';
+import LaunchpadIcon from '../../assets/images/Launchpad.png';
+import PreferencesIcon from '../../assets/images/Preferences.png';
+import TerminalIcon from '../../assets/images/Terminal.png';
 import Preferences from '../Preferences';
-import CalculatorIcon from './image/Calculator.png';
-import ChromeIcon from './image/Chrome.png';
-import DrawingIcon from './image/Drawing.png';
-import FinderIcon from './image/Finder.png';
-import LaunchpadIcon from './image/Launchpad.png';
-import PreferencesIcon from './image/Preferences.png';
-import TerminalIcon from './image/Terminal.png';
 import { AppState, DockConfig, DockPosition } from './types';
 /// <reference path="image.d.ts" />
 
