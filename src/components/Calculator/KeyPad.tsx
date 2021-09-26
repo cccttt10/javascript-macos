@@ -28,11 +28,11 @@ const KeyPad: React.FC = () => {
     const [keys, setKeys] = useState<string[]>(KEYS);
     const [operands, setOperands] = useState({ operand1: '', operand2: '' });
     const [operator, setOperator] = useState('');
-    const [result, setResult] = useState('0');
+    const [result, setResult] = useState('0'); // the displayed result
 
     // e.g. covert 70000000 to 7e+7
     // e.g. convert 0.0000007 to 7e-7
-    const removeZero = (text: string): string => {
+    const convertToScientificNotation = (text: string): string => {
         text = /\.\d+?0+$/g.test(text) ? text.replace(/0+$/g, '') : text;
         return text
             .replace(/\.0+$/g, '')
@@ -41,7 +41,9 @@ const KeyPad: React.FC = () => {
             .replace(/\.$/, '');
     };
 
-    const updateOperandsAndResult = useCallback(
+    // add new digit or decimal to one of the operands
+    // remember to update result
+    const addNewDigitToOperand = useCallback(
         (operand: 'operand1' | 'operand2', newDigit: string): void => {
             const updatedOperands = {
                 operand1:
@@ -58,7 +60,9 @@ const KeyPad: React.FC = () => {
             setOperands(updatedOperands);
             setResult(
                 updatedOperands[operand].length > 6
-                    ? removeZero(parseFloat(updatedOperands[operand]).toPrecision(6))
+                    ? convertToScientificNotation(
+                          parseFloat(updatedOperands[operand]).toPrecision(6)
+                      )
                     : updatedOperands[operand]
             );
         },
@@ -101,8 +105,8 @@ const KeyPad: React.FC = () => {
                     keys.unshift('C');
                     setKeys(keys);
                     operator
-                        ? updateOperandsAndResult('operand2', buttonText)
-                        : updateOperandsAndResult('operand1', buttonText);
+                        ? addNewDigitToOperand('operand2', buttonText)
+                        : addNewDigitToOperand('operand1', buttonText);
                 } else if ('+-×÷'.indexOf(buttonText) >= 0) {
                     setOperands({
                         operand1: operands.operand1 ? operands.operand1 : result,
@@ -112,7 +116,7 @@ const KeyPad: React.FC = () => {
                 } else if ('='.indexOf(buttonText) >= 0) {
                     if (operands.operand1 && operands.operand2) {
                         setResult(
-                            removeZero(
+                            convertToScientificNotation(
                                 evaluateResult(
                                     operands.operand1,
                                     operands.operand2,
@@ -130,20 +134,26 @@ const KeyPad: React.FC = () => {
                     setKeys(KEYS);
                 } else if (buttonText === '+/-' || buttonText === '%') {
                     if (operands.operand1 || result) {
-                        setResult(
-                            removeZero(
-                                evaluateResult(
-                                    operands.operand1,
-                                    operands.operand2,
-                                    buttonText
-                                )
+                        const updatedResult = convertToScientificNotation(
+                            evaluateResult(
+                                operands.operand1,
+                                operands.operand2,
+                                buttonText
                             )
                         );
+                        const updatedOperands = operands.operand2
+                            ? {
+                                  operand1: operands.operand1,
+                                  operand2: updatedResult,
+                              }
+                            : { operand1: updatedResult, operand2: '' };
+                        setOperands(updatedOperands);
+                        setResult(updatedResult);
                     }
                 }
             }
         },
-        [operator, operands, result, updateOperandsAndResult, evaluateResult]
+        [operator, operands, result, addNewDigitToOperand, evaluateResult]
     );
     useEffect(() => setResult(result), [result]);
 
