@@ -18,6 +18,7 @@ import LaunchpadIcon from '../../assets/images/Launchpad.png';
 import PreferencesIcon from '../../assets/images/Preferences.png';
 import TerminalIcon from '../../assets/images/Terminal.png';
 import { Calculator } from '../Calculator';
+import { Launchpad } from '../Launchpad';
 import Preferences from '../Preferences';
 import { AppState, DockConfig, DockPosition } from './types';
 /// <reference path="image.d.ts" />
@@ -52,7 +53,7 @@ const Dock: React.FC = () => {
         AppState.CLOSED
     );
     const [drawingState, setDrawingState] = useState<AppState>(AppState.CLOSED);
-    // const [showLaunchpad, setShowLaunchPad] = useState(false);
+    const [showLaunchpad, setShowLaunchPad] = useState(false);
 
     const handleDockIconClick = useCallback(
         (iconName: string) => {
@@ -70,6 +71,7 @@ const Dock: React.FC = () => {
                 iconName === CalculatorIcon ||
                 iconName === DrawingIcon
             ) {
+                setShowLaunchPad(false);
                 let appState: AppState = preferencesState;
                 let setAppState: typeof setPreferencesState = setPreferencesState;
                 switch (iconName) {
@@ -97,7 +99,7 @@ const Dock: React.FC = () => {
                 }
                 return;
             } else if (iconName === LaunchpadIcon) {
-                // setShowLaunchPad(true);
+                setShowLaunchPad(!showLaunchpad);
                 return;
             }
         },
@@ -107,6 +109,7 @@ const Dock: React.FC = () => {
             calculatorState,
             drawingState,
             BOUNCE_ANIMATION_DURATION,
+            showLaunchpad,
         ]
     );
 
@@ -301,6 +304,11 @@ const Dock: React.FC = () => {
             <Calculator
                 calculatorState={calculatorState}
                 setCalculatorState={setCalculatorState}
+            />
+            <Launchpad
+                showLaunchpad={showLaunchpad}
+                setShowLaunchPad={setShowLaunchPad}
+                handleDockIconClick={handleDockIconClick}
             />
             <footer className={dockConfig.position} id="AppFooter">
                 <div
