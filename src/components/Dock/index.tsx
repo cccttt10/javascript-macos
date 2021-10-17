@@ -18,6 +18,7 @@ import LaunchpadIcon from '../../assets/images/Launchpad.png';
 import PreferencesIcon from '../../assets/images/Preferences.png';
 import TerminalIcon from '../../assets/images/Terminal.png';
 import { Calculator } from '../Calculator';
+import Drawing from '../Drawing';
 import { Launchpad } from '../Launchpad';
 import Preferences from '../Preferences';
 import { AppState, DockConfig, DockPosition } from './types';
@@ -305,6 +306,7 @@ const Dock: React.FC = () => {
                 calculatorState={calculatorState}
                 setCalculatorState={setCalculatorState}
             />
+            <Drawing drawingState={drawingState} setDrawingState={setDrawingState} />
             <Launchpad
                 showLaunchpad={showLaunchpad}
                 setShowLaunchPad={setShowLaunchPad}
