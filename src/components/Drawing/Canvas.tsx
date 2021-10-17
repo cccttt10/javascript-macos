@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import dayjs from 'dayjs';
 import React, {
     CSSProperties,
     useCallback,
@@ -29,14 +30,14 @@ type Coordinate = {
 
 const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
     const { width, height, drawingRef, drawingState, setDrawingState } = props;
-    const colorMap = ['black', 'red', 'green', 'blue'];
-    const optionsMap = [
+    const colors = ['black', 'red', 'green', 'blue'];
+    const options = [
         'canvas_save',
         'canvas_clear',
         'turn_left_flat',
         'turn_right_flat',
     ];
-    const toolsMap = ['canvas_paint', 'canvas_eraser'];
+    const tools = ['canvas_paint', 'canvas_eraser'];
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const undoButtonRef = useRef<SVGSVGElement>(null);
     const redoButtonRef = useRef<SVGSVGElement>(null);
@@ -140,10 +141,10 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
         if (!undoButtonRef.current || !redoButtonRef.current) {
             return;
         }
-        const back: SVGSVGElement = undoButtonRef.current;
-        const go: SVGSVGElement = redoButtonRef.current;
-        back.classList.add('active');
-        go.classList.remove('active');
+        const undoButton: SVGSVGElement = undoButtonRef.current;
+        const redoButton: SVGSVGElement = redoButtonRef.current;
+        undoButton.classList.add('active');
+        redoButton.classList.remove('active');
     }, [step, canvasHistory]);
 
     const stopDrawing = useCallback(() => {
@@ -174,12 +175,12 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
         };
     }, [startDrawing, handleMouseMove, stopDrawing, leaveCanvas]);
 
-    const [isToolboxOpen, setToolboxOpen] = useState(true);
-    const toolboxOpenClick = useCallback(() => {
-        setToolboxOpen(!isToolboxOpen);
-    }, [isToolboxOpen]);
+    const [showToolbox, setShowToolbox] = useState(true);
+    const toggleToolboxOpen = useCallback(() => {
+        setShowToolbox(!showToolbox);
+    }, [showToolbox]);
 
-    const onToolsClick = useCallback((e, toolName) => {
+    const handleToolClick = useCallback((e, toolName) => {
         const el = e.currentTarget;
         if (el.classList[1]) return;
         toolName === 'canvas_eraser'
@@ -192,11 +193,7 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
         });
     }, []);
 
-    const onSizesChange = useCallback(e => {
-        setLineWidth(e.target.value);
-    }, []);
-
-    const onColorsClick = useCallback(([e, selector, color]) => {
+    const handleSelectColor = useCallback(([e, selector, color]) => {
         const el = e.target;
         if (el.className.includes('active')) return;
         setStrokeStyle(color);
@@ -207,51 +204,49 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
         });
     }, []);
 
-    const onColorsChange = useCallback(e => {
-        setStrokeStyle(e.target.value);
-    }, []);
-
     const { openDialog, closeDialog, RenderDialog } = useDialog();
-    const [isClearDialogOpen, setClearDialogOpen] = useState(false);
-    const [closeCanvas, setCloseCanvas] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
+    const [showCloseWarning, setShowCloseWarning] = useState(false);
 
     useImperativeHandle(drawingRef, () => ({
-        drawingCloseClick: () => {
+        drawingCloseClick: (): void => {
             if (step === -1) {
                 setDrawingState(AppState.CLOSED);
-            } else if (isClearDialogOpen) return;
-            setCloseCanvas(true);
+            } else if (showDialog) {
+                return;
+            }
+            setShowCloseWarning(true);
         },
     }));
 
     const [clearDialogText, setClearDialogText] = useState({
-        title: '您确定要清空该画布吗？',
-        message: '一旦清空将无法撤回。',
+        title: 'Clear drawings?',
+        message: 'This action cannot be undone.',
     });
 
     useEffect(() => {
-        if (closeCanvas) {
-            if (!isClearDialogOpen) {
+        if (showCloseWarning) {
+            if (!showDialog) {
                 setClearDialogText({
-                    title: '退出将丢失该画布！',
-                    message: '确认退出画板？',
+                    title: 'Close and exit?',
+                    message: 'You will lose your drawings.',
                 });
-                setClearDialogOpen(true);
+                setShowDialog(true);
             }
         } else {
             setClearDialogText({
-                title: '您确定要清空该画布吗？',
-                message: '一旦清空将无法撤回。',
+                title: 'Clear drawings?',
+                message: 'This action cannot be undone.',
             });
         }
-    }, [closeCanvas, isClearDialogOpen]);
+    }, [showCloseWarning, showDialog]);
 
     useEffect(
-        () => (isClearDialogOpen ? openDialog() : closeDialog()),
-        [closeDialog, isClearDialogOpen, openDialog]
+        () => (showDialog ? openDialog() : closeDialog()),
+        [closeDialog, showDialog, openDialog]
     );
 
-    const saveCanvas = useCallback(() => {
+    const downloadDrawings = useCallback(() => {
         if (!canvasRef.current) {
             return;
         }
@@ -268,14 +263,16 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
             const a = document.createElement('a');
             document.body.appendChild(a);
             a.href = imageData;
-            a.download = 'myPaint';
+            const timeFormat = 'MMM D, YYYY h:mm A'; // e.g. Aug 16, 2018 8:02 PM
+            const timeStamp = dayjs().format(timeFormat);
+            a.download = `Saved Drawings ${timeStamp}`;
             a.target = '_blank';
             a.click();
         }
     }, [width, height]);
 
-    const changeCanvas = useCallback(
-        type => {
+    const timeTravel = useCallback(
+        (type: 'redo' | 'undo') => {
             if (
                 !canvasRef.current ||
                 !undoButtonRef.current ||
@@ -285,30 +282,30 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
             }
             const canvas: HTMLCanvasElement = canvasRef.current;
             const context = canvas.getContext('2d');
-            const back: SVGSVGElement = undoButtonRef.current;
-            const go: SVGSVGElement = redoButtonRef.current;
+            const undoButton: SVGSVGElement = undoButtonRef.current;
+            const redoButton: SVGSVGElement = redoButtonRef.current;
             if (context) {
                 let currentStep = -1;
-                if (type === 'back' && step >= 0) {
+                if (type === 'undo' && step >= 0) {
                     currentStep = step - 1;
-                    go.classList.add('active');
+                    redoButton.classList.add('active');
                     if (currentStep < 0) {
-                        back.classList.remove('active');
+                        undoButton.classList.remove('active');
                     }
-                } else if (type === 'go' && step < canvasHistory.length - 1) {
+                } else if (type === 'redo' && step < canvasHistory.length - 1) {
                     currentStep = step + 1;
-                    back.classList.add('active');
+                    undoButton.classList.add('active');
                     if (currentStep === canvasHistory.length - 1) {
-                        go.classList.remove('active');
+                        redoButton.classList.remove('active');
                     }
                 } else {
                     return;
                 }
                 context.clearRect(0, 0, width, height);
-                const canvasPic = new Image();
-                canvasPic.src = canvasHistory[currentStep] as string;
-                canvasPic.addEventListener('load', () => {
-                    context.drawImage(canvasPic, 0, 0);
+                const canvasImage = new Image();
+                canvasImage.src = canvasHistory[currentStep] as string;
+                canvasImage.addEventListener('load', () => {
+                    context.drawImage(canvasImage, 0, 0);
                 });
                 setStep(currentStep);
             }
@@ -316,35 +313,35 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
         [canvasHistory, step, width, height]
     );
 
-    const onOptionsClick = useCallback(
+    const handleOptionClick = useCallback(
         toolName => {
             switch (toolName) {
                 case 'canvas_clear':
                     if (step === -1) return;
-                    setClearDialogOpen(true);
+                    setShowDialog(true);
                     break;
                 case 'canvas_save':
-                    saveCanvas();
+                    downloadDrawings();
                     break;
                 case 'turn_left_flat':
-                    changeCanvas('back');
+                    timeTravel('redo');
                     break;
                 case 'turn_right_flat':
-                    changeCanvas('go');
+                    timeTravel('undo');
                     break;
             }
         },
-        [saveCanvas, changeCanvas, step]
+        [downloadDrawings, timeTravel, step]
     );
 
-    const closeClearDialog = useCallback(() => {
-        setClearDialogOpen(false);
-        if (closeCanvas) {
-            setCloseCanvas(false);
+    const handleCancelDialog = useCallback(() => {
+        setShowDialog(false);
+        if (showCloseWarning) {
+            setShowCloseWarning(false);
         }
-    }, [setClearDialogOpen, closeCanvas, setCloseCanvas]);
+    }, [setShowDialog, showCloseWarning, setShowCloseWarning]);
 
-    const checkClearDialog = useCallback(() => {
+    const handleConfirmDialog = useCallback(() => {
         clearRect({
             x: 0,
             y: 0,
@@ -353,59 +350,60 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
         });
         setCanvasHistory([]);
         setStep(-1);
-        closeClearDialog();
+        handleCancelDialog();
         if (!undoButtonRef.current || !redoButtonRef.current) {
             return;
         }
-        const back: SVGSVGElement = undoButtonRef.current;
-        const go: SVGSVGElement = redoButtonRef.current;
-        back.classList.remove('active');
-        go.classList.remove('active');
-        if (closeCanvas) {
+        const undoButton: SVGSVGElement = undoButtonRef.current;
+        const redoButton: SVGSVGElement = redoButtonRef.current;
+        undoButton.classList.remove('active');
+        redoButton.classList.remove('active');
+        if (showCloseWarning) {
             setDrawingState(AppState.CLOSED);
-            setCloseCanvas(false);
+            setShowCloseWarning(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        closeClearDialog,
+        handleCancelDialog,
         clearRect,
         width,
         height,
-        closeCanvas,
-        setCloseCanvas,
+        showCloseWarning,
+        setShowCloseWarning,
         drawingState,
         setDrawingState,
     ]);
 
     return (
-        <>
+        <React.Fragment>
             <canvas id="canvas" ref={canvasRef} height={height} width={width} />
             <div
                 id="toolbox-open"
                 style={
                     {
-                        borderRadius: isToolboxOpen ? null : 5,
+                        borderRadius: showToolbox ? null : 5,
                     } as CSSProperties
                 }
             >
                 <Icon
-                    type={isToolboxOpen ? 'icon-upward_flat' : 'icon-downward_flat'}
+                    type={showToolbox ? 'icon-upward_flat' : 'icon-downward_flat'}
                     style={{
                         width: '100%',
                         fontSize: 32,
                     }}
-                    clickEvent={toolboxOpenClick}
+                    clickEvent={toggleToolboxOpen}
                 />
             </div>
             <CSSTransition
-                in={isToolboxOpen} //用于判断是否出现的状态
-                timeout={300} //动画持续时间
-                classNames="toolbox" //className值，防止重复
+                in={showToolbox}
+                timeout={300}
+                classNames="toolbox"
                 unmountOnExit
             >
                 <div id="toolbox">
                     <span>Options</span>
                     <div className="options">
-                        {optionsMap.map((option, index) => {
+                        {options.map((option, index) => {
                             return (
                                 <Icon
                                     svgRef={
@@ -419,14 +417,16 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
                                     className={option}
                                     type={'icon-' + option}
                                     style={{ fontSize: 50 }}
-                                    clickEvent={() => onOptionsClick(option)}
+                                    clickEvent={(): void =>
+                                        handleOptionClick(option)
+                                    }
                                 />
                             );
                         })}
                     </div>
                     <span>Toolbox</span>
                     <div className="tools">
-                        {toolsMap.map((tool, index) => {
+                        {tools.map((tool, index) => {
                             return (
                                 <Icon
                                     key={index + tool}
@@ -441,7 +441,9 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
                                     }
                                     type={'icon-' + tool}
                                     style={{ fontSize: 50 }}
-                                    clickEvent={e => onToolsClick(e, tool)}
+                                    clickEvent={(e): void =>
+                                        handleToolClick(e, tool)
+                                    }
                                 />
                             );
                         })}
@@ -461,11 +463,13 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
                             min="1"
                             max="20"
                             value={lineWidth}
-                            onChange={onSizesChange}
+                            onChange={(e): void =>
+                                setLineWidth(parseInt(e.target.value))
+                            }
                         />
                     </div>
                     <ol className="colors">
-                        {colorMap.map((color, index) => {
+                        {colors.map((color, index) => {
                             return (
                                 <li
                                     className={
@@ -474,14 +478,16 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
                                             : color
                                     }
                                     key={index + color}
-                                    onClick={e => onColorsClick([e, 'li', color])}
+                                    onClick={(e): void =>
+                                        handleSelectColor([e, 'li', color])
+                                    }
                                 />
                             );
                         })}
                         <input
                             type="color"
                             value={strokeStyle}
-                            onChange={onColorsChange}
+                            onChange={(e): void => setStrokeStyle(e.target.value)}
                             id="currentColor"
                         />
                     </ol>
@@ -494,10 +500,10 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
                 title={clearDialogText.title}
                 message={clearDialogText.message}
                 imgSource={DrawingIcon}
-                onConfirm={checkClearDialog}
-                onCancel={closeClearDialog}
+                onConfirm={handleConfirmDialog}
+                onCancel={handleCancelDialog}
             />
-        </>
+        </React.Fragment>
     );
 };
 
