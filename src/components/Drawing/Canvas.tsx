@@ -324,10 +324,10 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
                     downloadDrawings();
                     break;
                 case 'turn_left_flat':
-                    timeTravel('redo');
+                    timeTravel('undo');
                     break;
                 case 'turn_right_flat':
-                    timeTravel('undo');
+                    timeTravel('redo');
                     break;
             }
         },
