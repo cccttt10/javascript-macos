@@ -23,10 +23,10 @@ interface CanvasProps {
     setDrawingState: React.Dispatch<React.SetStateAction<AppState>>;
 }
 
-type Coordinate = {
+interface Position {
     x: number;
     y: number;
-};
+}
 
 const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
     const { width, height, drawingRef, drawingState, setDrawingState } = props;
@@ -45,13 +45,13 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
     const [lineWidth, setLineWidth] = useState(5);
     const [eraserEnabled, setEraserEnabled] = useState(false);
     const [isDrawing, setIsDrawing] = useState(false);
-    const [mousePosition, setMousePosition] = useState<Coordinate | undefined>(
+    const [mousePosition, setMousePosition] = useState<Position | undefined>(
         undefined
     );
     const [step, setStep] = useState(-1);
     const [canvasHistory, setCanvasHistory] = useState<string[]>([]);
 
-    const getCoordinates = (event: MouseEvent): Coordinate | undefined => {
+    const getCoordinates = (event: MouseEvent): Position | undefined => {
         if (!canvasRef.current) {
             return;
         }
@@ -70,7 +70,7 @@ const Canvas: React.FC<CanvasProps> = (props: CanvasProps): JSX.Element => {
     }, []);
 
     const drawLine = useCallback(
-        (originalMousePosition: Coordinate, newMousePosition: Coordinate) => {
+        (originalMousePosition: Position, newMousePosition: Position) => {
             if (!canvasRef.current) {
                 return;
             }
